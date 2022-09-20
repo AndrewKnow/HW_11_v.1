@@ -26,95 +26,114 @@ namespace ДЗ_11_v._1
         {
             try
             {
-                if (value == null)
-                {
-                    throw new MyExp1();
-                }
-                // Ограничение индексов размером массива
+                if (value == null) 
+                    throw new ArgumentNullException(nameof(value));
+
                 int hashKey = key % sizeArr;
 
-                if (dictArr[hashKey] != null)
+                if (hashKey == 0)
                 {
-                    // увелчиение массива
                     dictArr = IncreaseArr(sizeArr);
-                    throw new MyExp2();
                 }
 
-                dictArr[hashKey] = new DictArr() { Key = key, Value = value };
+                if (dictArr[key] != null)
+                {
+                    dictArr = IncreaseArr(sizeArr);
+                    throw new ArgumentOutOfRangeException(nameof(key));
+                }
+                else
+                {
+                    dictArr[hashKey] = new DictArr() { Key = key, Value = value };
+                }
+            }
 
-            }
-            catch (MyExp1)
+            catch (ArgumentNullException)
             {
-                Console.WriteLine("Пустое значение value");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Пустое значение value с ключом {key}");
+                Console.ResetColor();
             }
-            catch (MyExp2)
+            catch (ArgumentOutOfRangeException)
             {
-                Console.WriteLine($"Запись с ключом {key % sizeArr} существет, массив увеличен");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Запись с ключом {key} существет");
+                Console.ResetColor();
             }
-
         }
-        public string Get(int key)
+        public string СheckingNullKey(int key)
         {
-
-            int hashKey = key % sizeArr;
-
             try
             {
-                if (dictArr[hashKey] == null)
+                if (dictArr[key] != null)
                 {
-                    throw new MyExp3();
+                    return dictArr[key].Value;
                 }
+                else
+                {
+                    throw new ArgumentOutOfRangeException(nameof(key));
+                }
+
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write($"Запись с ключом {key} не существет");
+                Console.ResetColor();
+            }
+            return null;
+        }
+
+        public string Get(int key)
+        {
+            int hashKey = key % sizeArr;
+            try
+            {
+                if (dictArr.Length < key)
+                    throw new ArgumentOutOfRangeException(nameof(key));
+
+                СheckingNullKey(key);
+
                 if (dictArr[hashKey] != null)
                 {
                     return $"key: {dictArr[hashKey].Key} value: {dictArr[hashKey].Value}";
                 }
             }
-            catch (MyExp3)
-            {
-                Console.WriteLine($"Ключ {hashKey} не надйен");
-            }
             catch (ArgumentOutOfRangeException)
             {
-                Console.WriteLine($"Ключ {hashKey} за рамками дипазона");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write($"Запись с ключом {key} не существет");
+                Console.ResetColor();
             }
-
             return null;
         }
 
         DictArr[] IncreaseArr(int size)
         {
-
             sizeArr = size * 2;
             var increaseArr = new DictArr[sizeArr];
 
             int hashKey;
-            // передаем данные из dictArr в increaseArr
+
             for (int i = 0; i < dictArr.Length; i++)
             {
                 if (dictArr[i] != null)
                 {
-                    hashKey = dictArr[i].Key % sizeArr;
+                    hashKey = dictArr[i].Key;
+                    if (increaseArr[hashKey] != null)
+                    {
+                        IncreaseArr(size);
+                    }
                     increaseArr[hashKey] = dictArr[i];
                 }
             }
-
             return increaseArr;
         }
 
         public string this[int key]
         {
-            get { return Get(key); }
-            set { Add(key, value); }
+            get => Get(key);
+            set => Add(key, value);
         }
     }
-
-    internal class MyExp1 : Exception
-    {
-    }
-    internal class MyExp2 : Exception
-    {
-    }
-    internal class MyExp3 : Exception
-    {
-    }
 }
+
