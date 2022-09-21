@@ -24,6 +24,7 @@ namespace ДЗ_11_v._1
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine("Проверка по ключам:");
             Console.ResetColor();
+            Console.WriteLine(dictionary.Get(59));
             Console.WriteLine(dictionary.Get(100));
             Console.WriteLine(dictionary.Get(1));
             Console.WriteLine(dictionary.Get(2));
