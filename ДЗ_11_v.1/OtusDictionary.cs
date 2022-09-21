@@ -11,6 +11,9 @@ namespace ДЗ_11_v._1
         int sizeArr = 32;
         DictArr[] dictArr;
 
+        public const int MaxValue = int.MaxValue;
+        public const int MinValue = int.MinValue;
+
         public OtusDictionary()
         {
             dictArr = new DictArr[sizeArr];
@@ -22,111 +25,77 @@ namespace ДЗ_11_v._1
             public string Value { get; set; }
         }
 
+        int GetHashCode(int key)
+        {
+            int hashKey = key % sizeArr;
+            return hashKey;
+        }
+
         public void Add(int key, string value)
         {
             try
-            {
+            { 
                 if (value == null) 
                     throw new ArgumentNullException(nameof(value));
 
-                int hashKey = key % sizeArr;
+                int hashKey = GetHashCode(key);
 
-                if (hashKey == 0)
+                if (dictArr[hashKey] != null)
                 {
                     dictArr = IncreaseArr(sizeArr);
                 }
-
-                if (dictArr[key] != null)
-                {
-                    dictArr = IncreaseArr(sizeArr);
-                    throw new ArgumentOutOfRangeException(nameof(key));
-                }
-                else
-                {
-                    dictArr[hashKey] = new DictArr() { Key = key, Value = value };
-                }
+                dictArr[key % sizeArr] = new DictArr { Key = key, Value = value };
             }
-
             catch (ArgumentNullException)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Пустое значение value с ключом {key}");
                 Console.ResetColor();
             }
-            catch (ArgumentOutOfRangeException)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Запись с ключом {key} существет");
-                Console.ResetColor();
-            }
-        }
-        public string СheckingNullKey(int key)
-        {
-            try
-            {
-                if (dictArr[key] != null)
-                {
-                    return dictArr[key].Value;
-                }
-                else
-                {
-                    throw new ArgumentOutOfRangeException(nameof(key));
-                }
-
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write($"Запись с ключом {key} не существет");
-                Console.ResetColor();
-            }
-            return null;
         }
 
-        public string Get(int key)
-        {
-            int hashKey = key % sizeArr;
-            try
-            {
-                if (dictArr.Length < key)
-                    throw new ArgumentOutOfRangeException(nameof(key));
-
-                СheckingNullKey(key);
-
-                if (dictArr[hashKey] != null)
-                {
-                    return $"key: {dictArr[hashKey].Key} value: {dictArr[hashKey].Value}";
-                }
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write($"Запись с ключом {key} не существет");
-                Console.ResetColor();
-            }
-            return null;
-        }
+       public string Get(int key)
+       {
+           int hashKey = GetHashCode(key);
+           if (dictArr[hashKey] == null)
+           {
+               return $"Запись с ключом {key} не существет";
+           }
+           else
+           {
+               return $"Key: {dictArr[hashKey].Value} Value:{dictArr[hashKey].Value}";
+           }
+       }
 
         DictArr[] IncreaseArr(int size)
         {
-            sizeArr = size * 2;
-            var increaseArr = new DictArr[sizeArr];
-
-            int hashKey;
-
-            for (int i = 0; i < dictArr.Length; i++)
+            try
             {
-                if (dictArr[i] != null)
+                sizeArr = size * 2 + 1;
+
+                if (sizeArr >= MaxValue || sizeArr <= MinValue)
+                    throw new ArgumentOutOfRangeException();
+
+                var increaseArr = new DictArr[sizeArr];
+
+                foreach (var dict in dictArr)
                 {
-                    hashKey = dictArr[i].Key;
-                    if (increaseArr[hashKey] != null)
+                    if (dict == null)
                     {
-                        IncreaseArr(size);
+                        continue;
                     }
-                    increaseArr[hashKey] = dictArr[i];
+                    increaseArr[dict.Key % sizeArr] = new DictArr { Key = dict.Key, Value = dict.Value };
                 }
+
+                return increaseArr;
             }
-            return increaseArr;
+            catch (ArgumentOutOfRangeException)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("Превышен размер хэш функции");
+                Console.ResetColor();
+            }
+            return null;
         }
 
         public string this[int key]

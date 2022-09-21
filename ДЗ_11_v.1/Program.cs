@@ -8,11 +8,13 @@ namespace ДЗ_11_v._1
         {
 
             var dictionary = new OtusDictionary();
+
+
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine("Ошибки ввода:");
             Console.ResetColor();
             dictionary.Add(1, null);
-            dictionary.Add(3, "3 текст");
+            dictionary.Add(59, "59 текст");
             dictionary.Add(2, "2 текст");
             dictionary.Add(1, "1 текст");
             dictionary.Add(32, "32 текст");
